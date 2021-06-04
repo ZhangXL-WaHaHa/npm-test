@@ -1,0 +1,2 @@
+<comp fixRow="{{ false }}" showRemnantDays="{{ false }}" showHoliday="{{ true }}"
+			selectDate="{{selectDate}}" dateText="{{showDataText}}" bind:finishSelectDate="finishSelectDate"></comp>
