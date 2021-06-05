@@ -3,7 +3,7 @@ const clean = require('gulp-clean')
 
 const config = require('./tools/config')
 const BuildTask = require('./tools/build')
-const id = require('./package.json').name || 'miniprogram-custom-component'
+const id = require('./package.json').name || 'miniprogram-slide-calendar'
 
 // 构建任务实例
 // eslint-disable-next-line no-new
