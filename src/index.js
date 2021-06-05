@@ -7,6 +7,9 @@ const DAY_TYPE = ['last', 'cur', 'next'] // 类型，分为上月，本月和下
 let preHeight = 999 // 记录上一次高度，实现过渡动画
 
 Component({
+  /**
+   * 组件的属性列表
+   */
   properties: {
     // 日历类型
     // 默认是单选类型，提供选择范围和多选类型[range, multiple]
@@ -82,6 +85,7 @@ Component({
       value: false
     },
 
+    // 日期是否显示相关的数据
     dateText: {
       type: Array,
       value: [{
@@ -122,6 +126,9 @@ Component({
     }
   },
 
+  /**
+   * 组件的初始数据
+   */
   data: {
     dayType: DAY_TYPE,
     weekList: ['日', '一', '二', '三', '四', '五', '六'], // 一周
@@ -159,24 +166,25 @@ Component({
   },
 
   // 一开始加载时获取当前的时间
-  lifetimes: {
-    attached() {
-      this.data.calendarInfo.cur = Object.assign(
-        {},
-        dateUtil.formatNowDate(this.properties.beginTime),
-        {list: []}
-      )
-      this.formatMonthData(this.data.calendarInfo.cur)
-      // 计算上个月和下个月的数据
-      this.getLastMonth()
-      this.getNextMonth()
-      // 计算完成
-      this.setData({
-        'calendarInfo.cur': this.data.calendarInfo.cur,
-      })
-    },
+  attached() {
+    this.data.calendarInfo.cur = Object.assign(
+      {}, dateUtil.formatNowDate(this.properties.beginTime), {list: []}
+    )
+
+    this.formatMonthData(this.data.calendarInfo.cur)
+    // 计算上个月和下个月的数据
+    this.getLastMonth()
+    this.getNextMonth()
+
+    // 计算完成
+    this.setData({
+      'calendarInfo.cur': this.data.calendarInfo.cur,
+    })
   },
 
+  /**
+   * 组件的方法列表
+   */
   methods: {
     // 获取本月的天数和1号是星期几
     formatMonthData(date) {
@@ -230,7 +238,9 @@ Component({
       const endTimeStamp = new Date(this.properties.selectDateRange.end.replace(/-/g, '/')).getTime()
 
       // 判断是否有选择日期
-      if (!((this.properties.selectDateRange.begin === '' && this.properties.selectDateRange.end === '') || beginTimeStamp > endTimeStamp)) {
+      if (!((this.properties.selectDateRange.begin === '' &&
+          this.properties.selectDateRange.end === '') || beginTimeStamp >
+          endTimeStamp)) {
         // 判断日期是否在选择范围之内
         date.list.forEach((item) => {
           const timeStamp = new Date(date.year + '/' + date.month + '/' + item.value).getTime()
@@ -290,12 +300,14 @@ Component({
         })
       }
 
+      // 格式化显示的提示信息
       this.formatShowTip(date)
     },
 
     // 获取上个月的日期数据
     getLastMonth() {
-      const changeKey = [this.data.showCalendarIndex - 1 >= 0 ? this.data.showCalendarIndex - 1 : 2]
+      const changeKey = DAY_TYPE[this.data.showCalendarIndex - 1 >= 0
+        ? this.data.showCalendarIndex - 1 : 2]
       const date = this.data.calendarInfo[DAY_TYPE[this.data.showCalendarIndex]]
       let changeDate = this.data.calendarInfo[changeKey]
 
@@ -357,6 +369,7 @@ Component({
       })
     },
 
+    // 点击选中某个时间节点
     selectDate(e) {
       const key = e.currentTarget.dataset.key
       const index = e.currentTarget.dataset.index
@@ -501,8 +514,9 @@ Component({
 
         // 设置相关的日期颜色范围,使用时间戳判断
         Object.keys(this.data.calendarInfo).forEach(item => {
-          this.data.calendarInfo[item].list.forEach(arr => {
-            const timeStamp = new Date(this.data.calendarInfo[item].year + '/' + this.data.calendarInfo[item].month + '/' + arr.value).getTime()
+          this.data.calendarInfo[item].list.forEach((arr) => {
+            const timeStamp = new Date(this.data.calendarInfo[item].year + '/' + this.data.calendarInfo[item].month + '/' +
+                arr.value).getTime()
             if (timeStamp > beginTimeStamp && timeStamp < endTimeStamp && arr.type === 'cur') {
               arr.color = 'between'
             } else if (timeStamp === endTimeStamp && arr.type === 'cur') {
@@ -545,6 +559,7 @@ Component({
       }
     },
 
+    // 格式化显示的文字
     formatShowTip(date) {
       // 判断是否显示相关的节假日
       if (this.properties.showHoliday) {
@@ -576,7 +591,7 @@ Component({
             case 'next':
               value = (date.month + 1 > 12 ? 1 : date.month + 1) + '-' + arr.value
               break
-            default: value = 0
+            default: value = date.month + '-' + arr.value
           }
           if (item.value === value) {
             arr.tip = Object.assign(
@@ -584,7 +599,7 @@ Component({
               item,
               {
                 color: arr.type === 'cur' ? 'red' : '',
-                type: 'text',
+                type: 'text'
               }
             )
           }
@@ -661,16 +676,20 @@ Component({
           }
         })
       })
+      const setValue = Object.assign(
+        {},
+        this.properties.selectDateRange,
+        {
+          begin: '',
+          end: ''
+        }
+      )
       // 清空预设值
       this.setData({
         calendarInfo: this.data.calendarInfo,
         selectDate: '',
         selectDateMultiple: [],
-        selectDateRange: Object.assign(
-          {},
-          this.properties.selectDateRange,
-          {begin: '', end: ''}
-        )
+        selectDateRange: setValue
       })
     },
 
